@@ -1,0 +1,4 @@
+gauss-elim
+==========
+
+Gaussova eliminace
