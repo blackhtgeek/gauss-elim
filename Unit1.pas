@@ -53,7 +53,8 @@ begin
         StringGrid1.Refresh;
 end;
 
-procedure swap(var i,n,pivot:integer;matice:Matrix;vektor:Vector);
+
+procedure swap(i:integer; var n,pivot:integer;matice:Matrix;vektor:Vector);
 var k:integer; help:real;
 begin
         for k:=i to n do begin
@@ -91,7 +92,7 @@ begin
 {Gaussova elimiace s vyberem pivota}
         for i:=1 to n do begin
                 pivot:=pivot_lookup(i,n,matice);
-                if i<> pivot then swap(i,n,pivot,matice,vektor);
+                if i <> pivot then swap(i,n,pivot,matice,vektor);
                 elimine(matice,vektor,n,i,j);
         end;
         rev_sbst(matice,vektor,n,reseni);
@@ -113,6 +114,7 @@ end;
 
 procedure out2file(var n:integer; var reseni:Vector);
 var f:TextFile; i:integer;
+
 begin
         assign(f,'out.txt');
         rewrite(f);
