@@ -23,6 +23,8 @@ type
   public
     { Public declarations }
   end;
+  
+const nula=0.000001;
 
 var
   Form1: TForm1;
@@ -32,14 +34,14 @@ implementation
 
 {$R *.dfm}
 
-function pivot_lookup(i:integer; var n:integer; matice:Matrix):integer;
+function pivot_lookup(i:integer; n:integer; var matice:Matrix):integer;
 var k:integer; max:real;
 begin
         pivot_lookup:=i;
         max:=abs(matice[i][i]);
-        for k:=i+1 to n do
-                if abs(matice[i][k])>max then begin
-                    max:=abs(matice[i][k]);
+        for k:=i+1 to n-1 do
+                if abs(matice[k,i])>max then begin
+                    max:=abs(matice[k,i]);
                     pivot_lookup:=k;
                  end;
 end;
@@ -53,49 +55,48 @@ begin
         StringGrid1.Refresh;
 end;
 
-
-procedure swap(i:integer; var n,pivot:integer;matice:Matrix;vektor:Vector);
+procedure swap(i,n,pivot:integer;var matice:Matrix;var vektor:Vector);
 var k:integer; help:real;
 begin
-        for k:=i to n do begin
-            help:=matice[k][pivot];
-            matice[k][pivot]:=matice[k][i];
-            matice[k][i]:=help;
+        for k:=i to n-1 do begin
+            help:=matice[k,pivot];
+            matice[k,pivot]:=matice[k,i];
+            matice[k,i]:=help;
         end;
         help:=vektor[pivot];
         vektor[pivot]:=vektor[i];
         vektor[i]:=help;
 end;
 
-procedure elimine(matice:Matrix;vektor:Vector; var n:integer; i,j:integer);
-var help:real; k:integer;
-begin
-     for k:=i+1 to n do begin
-        help:=matice[i][k]/matice[i][i];
-        for j:=i+1 to n do matice[j][k]:=matice[j][k]-help*matice[j][i];
-        vektor[k]:=vektor[k]-help*vektor[i];
-     end;
-end;
-
-procedure rev_sbst(matice:Matrix;vektor:Vector;var n:integer;reseni:Vector);
+procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
 var i,j:integer;
 begin
-     for i:=n downto 1 do begin
-        for j:=i+1 to n do vektor[i]:=vektor[i]-matice[j][i]*vektor[j];
-        reseni[i]:=vektor[i]/matice[i][i];
+     try for i:=n-1 downto 0 do begin
+        for j:=i+1 to n-1 do vektor[i]:=vektor[i]-matice[j,i]*vektor[j];
+        if abs(matice[i,i])>nula then vektor[i]:=vektor[i]/matice[i,i]
+        else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
+     end;
+     except on E:Exception do ShowMessage(E.Message);
      end;
 end;
 
-procedure gauss(var n:integer; matice:Matrix; vektor:Vector; reseni:Vector);
-var a,i,j,pivot:integer;
+procedure gauss(var n:integer; var matice:Matrix; var vektor:Vector);
+var i,j,k,pivot:integer; help:real;
 begin
 {Gaussova elimiace s vyberem pivota}
-        for i:=1 to n do begin
+        try for i:=0 to n-1 do begin
                 pivot:=pivot_lookup(i,n,matice);
                 if i <> pivot then swap(i,n,pivot,matice,vektor);
-                elimine(matice,vektor,n,i,j);
+                for k:=i+1 to n-1 do begin
+                        if abs(matice[i,i])>nula then begin
+                                help:=matice[i,k]/matice[i,i];
+                                for j:=i+1 to n-1 do matice[j,k]:=matice[j,k]-help*matice[j,i];
+                                vektor[k]:=vektor[k]-help*vektor[i];
+                        end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
+                end;
         end;
-        rev_sbst(matice,vektor,n,reseni);
+        except on E:Exception do ShowMessage(E.Message); end;
+        rev_sbst(matice,vektor,n);
 end;
 
 procedure in2file(var n:integer; var matice:Matrix; var vektor:Vector);
@@ -104,7 +105,7 @@ begin
         assignfile(f,'loaded.txt');
         rewrite(f);
         for i:=0 to n-1 do begin
-                for j:=0 to n-1 do write(f,matice[i,j],' ');
+                for j:=0 to n-1 do write(f,matice[j,i],' ');
                 writeln(f,'');
         end;{v souboru data po radcich}
         writeln(f,'');
@@ -112,38 +113,30 @@ begin
         closefile(f);
 end;
 
-procedure out2file(var n:integer; var reseni:Vector);
+procedure out2file(var n:integer; var vektor:Vector);
 var f:TextFile; i:integer;
-
 begin
         assign(f,'out.txt');
         rewrite(f);
-        for i:=1 to n do write(f,reseni[i],' ');
+        for i:=0 to n-1 do write(f,vektor[i]:8:3,' ');
         closefile(f);
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
-var i,j,code:integer; matice:Matrix; vektor:Vector; vyjimka:Exception; reseni:Vector;
+var i,j,code:integer; matice:Matrix; vektor:Vector;
 begin
-        vyjimka:=Exception.Create('Spatny vstup');
         {prepise data ze StringGrid do poli matice a vektor}
-try     for i:=1 to n+1 do
-                for j:=1 to n+1 do begin
-                        Val(StringGrid1.Cells[i,j],matice[i-1,j-1],code);
-                        {if code<>0 then raise vyjimka}
-                end;
-        for i:=0 to n do begin
+       for i:=1 to n+1 do
+                for j:=1 to n+1 do
+                        Val(StringGrid1.Cells[i,j],matice[i-1,j-1],code);            
+        for i:=0 to n do
                 Val(StringGrid1.Cells[n+1,i+1],vektor[i],code);
-                {if code<>0 then raise vyjimka}
-        end;
-except  on E:Exception do ShowMessage(E.Message);
-end;
         {zapise data do souboru pro kontrolu toho, co se nacetlo}
-        in2file(n,matice,vektor);
+        {in2file(n,matice,vektor);}
         {spusti Gaussovu eliminaci, ziskame vektor reseni}
-        gauss(n,matice,vektor,reseni);
+        gauss(n,matice,vektor);
         {zapiseme vektor do souboru}
-        out2file(n,reseni);
+        out2file(n,vektor);
 end;
 
 end.
