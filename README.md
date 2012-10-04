@@ -1,4 +1,5 @@
 gauss-elim
 ==========
 
-Gaussova eliminace
+Gaussova eliminace s vyberem pivota
+Gauss-jordanova eliminace
