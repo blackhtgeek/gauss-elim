@@ -44,6 +44,7 @@ implementation
 function pivot_lookup(i:integer; n:integer; var matice:Matrix):integer;
 var k,return:integer; max:real; vyjimka:Exception;
 begin
+  {v i-tem sloupci hledam nejvetsi prvek}
   vyjimka:=Exception.Create('Reseni je nejednoznacne - hledane maximum v '+inttostr(i+1)+' sloupci je 0');
   return:=i;
   try
@@ -75,6 +76,7 @@ end;
 procedure swap(i,n,pivot:integer;var matice:Matrix;var vektor:Vector);
 var k:integer; help:real;
 begin
+        {prohodim v i-tem sloupci k-ty radek s pivot-ym radkem}
         for k:=i to n-1 do begin
             help:=matice[k,pivot];
             matice[k,pivot]:=matice[k,i];
@@ -88,6 +90,7 @@ end;
 procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
 var i,j:integer;
 begin
+    {zpetne dosazuji a ziskavam reseni soustavy v poli vektor}
      try 
      if matice[n-1,n-1]=0 then
         if vektor[n-1]<>0 then raise Exception.Create('Soustava nema reseni')
@@ -106,9 +109,9 @@ var i,j,k,pivot:integer; help:real;
 begin
 {Gaussova elimiace s vyberem pivota}
         try for i:=0 to n-1 do begin
-                pivot:=pivot_lookup(i,n,matice);
-                if i <> pivot then swap(i,n,pivot,matice,vektor);
-                for k:=i+1 to n-1 do begin
+                pivot:=pivot_lookup(i,n,matice); {najdu nejvetsi prvek ve sloupci}
+                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
+                for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
                         if abs(matice[i,i])>nula then begin
                                 help:=matice[i,k]/matice[i,i];
                                 for j:=i+1 to n-1 do matice[j,k]:=matice[j,k]-help*matice[j,i];
@@ -117,12 +120,13 @@ begin
                 end;
         end;
         except on E:Exception do ShowMessage(E.Message); end;
-        rev_sbst(matice,vektor,n);
+        rev_sbst(matice,vektor,n); {reverzni substituci ziskam reseni}
 end;
 
 procedure outprint(var n:integer; var vektor:Vector);
 var i:integer;
 begin
+  {vypisu mnozinu reseni do labelu}
         if form1.label2.Caption=' ' then begin
                 Form1.Label2.Caption:='K={';
                 for i:=0 to n-1 do Form1.Label2.Caption:=Form1.Label2.Caption+floattostr(vektor[i])+',';
@@ -139,12 +143,8 @@ begin
                         Val(StringGrid1.Cells[i,j],matice[i-1,j-1],code);            
         for i:=0 to n do
                 Val(StringGrid1.Cells[n+1,i+1],vektor[i],code);
-        {zapise data do souboru pro kontrolu toho, co se nacetlo}
-        {in2file(n,matice,vektor);}
         {spusti Gaussovu eliminaci, ziskame vektor reseni}
         gauss(n,matice,vektor);
-        {zapiseme vektor do souboru}
-        {out2file(n,vektor);}
         {vypis vektoru na obrazovku}
         outprint(n,vektor);
 end;
@@ -154,6 +154,7 @@ const a=ord('a');
 const x=ord('x');
 var i:integer;
 begin
+  {popise policka ve stringgridu pro uzivatelskou privetivost}
         for i:=1 to n do
                 Form1.StringGrid1.Cells[0,i]:='rovnice '+inttostr(i);
         for i:=1 to n do
