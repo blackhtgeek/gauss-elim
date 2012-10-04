@@ -24,7 +24,7 @@ type
   public
     { Public declarations }
   end;
-  
+
 const nula=0.000001;
 
 var
@@ -33,10 +33,9 @@ var
 
 procedure swap(i,n,pivot:integer;var matice:Matrix;var vektor:Vector);
 procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
-procedure gauss(var n:integer; var matice:Matrix; var vektor:Vector);
+procedure gauss(n:integer; var matice:Matrix; var vektor:Vector);
 procedure outprint(var n:integer; var vektor:Vector);
 procedure popis_stringgrid(n:integer);
-procedure jordan(var n:integer; var matice:matrix; var vektor:Vector);
 
 implementation
 
@@ -61,28 +60,6 @@ begin
         on E:Exception do ShowMessage(E.Message);
   end;
         pivot_lookup:=return;
-end;
-
-procedure jordan(var n:integer; var matice:matrix; var vektor:vector);
-var i,j,k:integer; var vyjimka:Exception;
-begin
-{jordanova eliminace - jde o to dostat nuly nad hlavni diagonalou}
-        vyjimka:=Exception.Create('Spatny vstup - nedovolene deleni nulou');
-        try for i:=0 to n-1 do begin
-                for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
-                        if abs(matice[i,i])>nula then 
-                          if k<>i then begin
-                                help:=matice[i,k]/matice[k,k];
-                                for j:=i+1 to n-1 do matice[i,j]:=matice[i,j]-help*matice[k,j];
-                          end
-                        else raise vyjimka;{jak to pozna ke kteremu if-u patri?}
-                end;
-                if abs(matice[i,i])>nula then vektor[i]:=vektor[i]/matice[i,i]
-                else raise vyjimka;
-            end;
-            {JESTE SE CHCE MIT NA HLAVNI DIAGONALE SAME JEDNICKY}
-        except on E:Exception do ShowMessage(E.Message); 
-        end;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -114,7 +91,7 @@ procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
 var i,j:integer;
 begin
     {zpetne dosazuji a ziskavam reseni soustavy v poli vektor}
-     try 
+     try
      if matice[n-1,n-1]=0 then
         if vektor[n-1]<>0 then raise Exception.Create('Soustava nema reseni')
         else if vektor[n+1]=0 then Exception.Create('Resenim je mnozina realnych cisel')
@@ -127,7 +104,7 @@ begin
      end;
 end;
 
-procedure gauss(var n:integer; var matice:Matrix; var vektor:Vector);
+procedure gauss(n:integer; var matice:Matrix; var vektor:Vector);
 var i,j,k,pivot:integer; help:real;
 begin
 {Gaussova elimiace s vyberem pivota}
@@ -163,7 +140,7 @@ begin
         {prepise data ze StringGrid do poli matice a vektor}
        for i:=1 to n+1 do
                 for j:=1 to n+1 do
-                        Val(StringGrid1.Cells[i,j],matice[i-1,j-1],code);            
+                        Val(StringGrid1.Cells[i,j],matice[i-1,j-1],code);
         for i:=0 to n do
                 Val(StringGrid1.Cells[n+1,i+1],vektor[i],code);
         {spusti Gaussovu eliminaci, ziskame vektor reseni}
