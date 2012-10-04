@@ -16,6 +16,7 @@ type
     Button1: TButton;
     Button2: TButton;
     SpinEdit1: TSpinEdit;
+    Label2: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
@@ -30,20 +31,34 @@ var
   Form1: TForm1;
   n:integer;
 
+procedure swap(i,n,pivot:integer;var matice:Matrix;var vektor:Vector);
+procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
+procedure gauss(var n:integer; var matice:Matrix; var vektor:Vector);
+procedure outprint(var n:integer; var vektor:Vector);
+procedure popis_stringgrid(n:integer);
+
 implementation
 
 {$R *.dfm}
 
 function pivot_lookup(i:integer; n:integer; var matice:Matrix):integer;
-var k:integer; max:real;
+var k,return:integer; max:real; vyjimka:Exception;
 begin
-        pivot_lookup:=i;
+  vyjimka:=Exception.Create('Reseni je nejednoznacne - hledane maximum v '+inttostr(i+1)+' sloupci je 0');
+  return:=i;
+  try
         max:=abs(matice[i][i]);
+        if max<=nula then raise vyjimka;
         for k:=i+1 to n-1 do
                 if abs(matice[k,i])>max then begin
                     max:=abs(matice[k,i]);
-                    pivot_lookup:=k;
+                    if max<=nula then raise vyjimka;
+                    return:=k;
                  end;
+  except
+        on E:Exception do ShowMessage(E.Message);
+  end;
+        pivot_lookup:=return;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -53,6 +68,8 @@ begin
         StringGrid1.ColCount:=n+2;
         StringGrid1.RowCount:=n+1;
         StringGrid1.Refresh;
+        popis_stringgrid(n);
+        StringGrid1.Enabled:=true;
 end;
 
 procedure swap(i,n,pivot:integer;var matice:Matrix;var vektor:Vector);
@@ -71,7 +88,11 @@ end;
 procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
 var i,j:integer;
 begin
-     try for i:=n-1 downto 0 do begin
+     try 
+     if matice[n-1,n-1]=0 then
+        if vektor[n-1]<>0 then raise Exception.Create('Soustava nema reseni')
+        else if vektor[n+1]=0 then Exception.Create('Resenim je mnozina realnych cisel')
+     else for i:=n-1 downto 0 do begin
         for j:=i+1 to n-1 do vektor[i]:=vektor[i]-matice[j,i]*vektor[j];
         if abs(matice[i,i])>nula then vektor[i]:=vektor[i]/matice[i,i]
         else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
@@ -99,27 +120,14 @@ begin
         rev_sbst(matice,vektor,n);
 end;
 
-procedure in2file(var n:integer; var matice:Matrix; var vektor:Vector);
-var f:TextFile; i,j:integer;
+procedure outprint(var n:integer; var vektor:Vector);
+var i:integer;
 begin
-        assignfile(f,'loaded.txt');
-        rewrite(f);
-        for i:=0 to n-1 do begin
-                for j:=0 to n-1 do write(f,matice[j,i],' ');
-                writeln(f,'');
-        end;{v souboru data po radcich}
-        writeln(f,'');
-        for i:=0 to n-1 do write(f,vektor[i],' ');
-        closefile(f);
-end;
-
-procedure out2file(var n:integer; var vektor:Vector);
-var f:TextFile; i:integer;
-begin
-        assign(f,'out.txt');
-        rewrite(f);
-        for i:=0 to n-1 do write(f,vektor[i]:8:3,' ');
-        closefile(f);
+        if form1.label2.Caption=' ' then begin
+                Form1.Label2.Caption:='K={';
+                for i:=0 to n-1 do Form1.Label2.Caption:=Form1.Label2.Caption+floattostr(vektor[i])+',';
+                Form1.Label2.Caption:='}';
+        end;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -136,7 +144,21 @@ begin
         {spusti Gaussovu eliminaci, ziskame vektor reseni}
         gauss(n,matice,vektor);
         {zapiseme vektor do souboru}
-        out2file(n,vektor);
+        {out2file(n,vektor);}
+        {vypis vektoru na obrazovku}
+        outprint(n,vektor);
+end;
+
+procedure popis_stringgrid(n:integer);
+const a=ord('a');
+const x=ord('x');
+var i:integer;
+begin
+        for i:=1 to n do
+                Form1.StringGrid1.Cells[0,i]:='rovnice '+inttostr(i);
+        for i:=1 to n do
+                Form1.StringGrid1.Cells[i,0]:=chr(a+i-1)+'x'+inttostr(i);
+        Form1.StringGrid1.Cells[n+1,0]:='prava strana';
 end;
 
 end.

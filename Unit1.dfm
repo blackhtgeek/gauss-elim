@@ -1,8 +1,8 @@
 object Form1: TForm1
-  Left = 207
-  Top = 325
-  Width = 870
-  Height = 640
+  Left = 136
+  Top = 109
+  Width = 841
+  Height = 442
   Caption = 'Gaussova eliminace'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,7 +18,19 @@ object Form1: TForm1
     Top = 8
     Width = 106
     Height = 16
-    Caption = 'Po'#269'et nezn'#225'm'#253'ch'
+    Caption = 'Pocet nezn'#225'm'#253'ch'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 344
+    Top = 16
+    Width = 3
+    Height = 16
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -29,8 +41,9 @@ object Form1: TForm1
   object StringGrid1: TStringGrid
     Left = 8
     Top = 40
-    Width = 769
-    Height = 505
+    Width = 809
+    Height = 353
+    Enabled = False
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
     TabOrder = 0
   end
@@ -39,7 +52,7 @@ object Form1: TForm1
     Top = 8
     Width = 75
     Height = 25
-    Caption = 'P'#345'ekresli'
+    Caption = 'Prekresli'
     TabOrder = 1
     OnClick = Button1Click
   end
@@ -48,7 +61,7 @@ object Form1: TForm1
     Top = 8
     Width = 75
     Height = 25
-    Caption = 'Po'#269#237'tej'
+    Caption = 'Poc'#237'tej'
     TabOrder = 2
     OnClick = Button2Click
   end
