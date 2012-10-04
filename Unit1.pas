@@ -36,6 +36,7 @@ procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
 procedure gauss(var n:integer; var matice:Matrix; var vektor:Vector);
 procedure outprint(var n:integer; var vektor:Vector);
 procedure popis_stringgrid(n:integer);
+procedure jordan(var n:integer; var matice:matrix; var vektor:Vector);
 
 implementation
 
@@ -60,6 +61,28 @@ begin
         on E:Exception do ShowMessage(E.Message);
   end;
         pivot_lookup:=return;
+end;
+
+procedure jordan(var n:integer; var matice:matrix; var vektor:vector);
+var i,j,k:integer; var vyjimka:Exception;
+begin
+{jordanova eliminace - jde o to dostat nuly nad hlavni diagonalou}
+        vyjimka:=Exception.Create('Spatny vstup - nedovolene deleni nulou');
+        try for i:=0 to n-1 do begin
+                for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
+                        if abs(matice[i,i])>nula then 
+                          if k<>i then begin
+                                help:=matice[i,k]/matice[k,k];
+                                for j:=i+1 to n-1 do matice[i,j]:=matice[i,j]-help*matice[k,j];
+                          end
+                        else raise vyjimka;{jak to pozna ke kteremu if-u patri?}
+                end;
+                if abs(matice[i,i])>nula then vektor[i]:=vektor[i]/matice[i,i]
+                else raise vyjimka;
+            end;
+            {JESTE SE CHCE MIT NA HLAVNI DIAGONALE SAME JEDNICKY}
+        except on E:Exception do ShowMessage(E.Message); 
+        end;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
