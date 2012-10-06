@@ -48,12 +48,10 @@ begin
   {v i-tem sloupci hledam nejvetsi prvek}
   return:=i;
   max:=abs(matice[i][i]);
-  {if IsZero(max,nula) then begin ShowMessage('Reseni je nejednoznacne - hledane maximum v '+inttostr(i+1)+' sloupci je 0'); end;}
   for k:=i+1 to n-1 do
         if abs(matice[k,i])>max then begin
               max:=abs(matice[k,i]);
-                {if isZero(max,nula) then ShowMessage('Reseni je nejednoznacne - hledane maximum v '+inttostr(i+1)+' sloupci je 0');}
-                return:=k;
+              return:=k;
         end;
   pivot_lookup:=return;
 end;
@@ -106,17 +104,20 @@ begin
 {Gaussova elimiace s vyberem pivota}
         try for i:=0 to n-1 do begin
                 pivot:=pivot_lookup(i,n,matice); {najdu nejvetsi prvek ve sloupci}
-                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
-                for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
-                        if not isZero(abs(matice[i,i]),nula) then begin
-                                help:=matice[i,k]/matice[i,i];
-                                for j:=i+1 to n-1 do matice[j,k]:=matice[j,k]-help*matice[j,i];
-                                vektor[k]:=vektor[k]-help*vektor[i];
-                        end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
-                end;
+		if isZero(pivot,nula) then ShowMessage('Neni pravda, ze existuje jedine reseni')
+		else begin
+	                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
+        	        for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
+                	        if not isZero(abs(matice[i,i]),nula) then begin
+                        	        help:=matice[i,k]/matice[i,i];
+                                	for j:=i+1 to n-1 do matice[j,k]:=matice[j,k]-help*matice[j,i];
+	                                vektor[k]:=vektor[k]-help*vektor[i];
+        	                end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
+                	end;
+		end;
         end;
         except on E:Exception do ShowMessage(E.Message); end;
-        rev_sbst(matice,vektor,n); {reverzni substituci ziskam reseni}
+        if not isZero(pivot,nula) then rev_sbst(matice,vektor,n); {reverzni substituci ziskam reseni}
 end;
 
 procedure outprint(var n:integer; var vektor:Vector);
