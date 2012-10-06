@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 229
-  Top = 325
+  Left = 196
+  Top = 125
   Width = 841
   Height = 442
   Caption = 'Gaussova eliminace'

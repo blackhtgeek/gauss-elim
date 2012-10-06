@@ -49,8 +49,8 @@ begin
   return:=i;
   max:=abs(matice[i][i]);
   for k:=i+1 to n-1 do
-        if abs(matice[k,i])>max then begin
-              max:=abs(matice[k,i]);
+        if abs(matice[i,k])>max then begin
+              max:=abs(matice[i,k]);
               return:=k;
         end;
   pivot_lookup:=return;
@@ -88,7 +88,7 @@ begin
     {zpetne dosazuji a ziskavam reseni soustavy v poli vektor}
      if isZero(matice[n-1,n-1],nula) then begin
         if not isZero(vektor[n-1],nula) then ShowMessage('Soustava nema reseni')
-        else if isZero(vektor[n+1],nula) then ShowMessage('Resenim je mnozina realnych cisel');
+        else if isZero(vektor[n+1],nula) then ShowMessage('Nekonecne mnoho reseni');
         noresult:=true;
      end
      else for i:=n-1 downto 0 do begin
@@ -104,8 +104,8 @@ begin
 {Gaussova elimiace s vyberem pivota}
         try for i:=0 to n-1 do begin
                 pivot:=pivot_lookup(i,n,matice); {najdu nejvetsi prvek ve sloupci}
-		if isZero(pivot,nula) then ShowMessage('Neni pravda, ze existuje jedine reseni')
-		else begin
+		{if isZero(pivot,nula) then ShowMessage('Neni pravda, ze existuje jedine reseni')
+		else} begin
 	                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
         	        for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
                 	        if not isZero(abs(matice[i,i]),nula) then begin
