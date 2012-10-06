@@ -58,9 +58,20 @@ begin
 end;
 
 procedure gauss_jordan(n:integer; var matice:integer; var vektor:Vector);
+var i,j,k:integer;
 begin
 	gauss(n,matice,vektor);{mame matici s nulami pod hlavni diagonalou}
 	{ted jeste ziskat nuly nad hlavni diagonalou}
+	try for i:=0 to n-1 do
+		if not noresult then begin
+			for k:=i+1 downto 0 do begin {pro vsechny vyssi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
+           			if not isZero(abs(matice[i,i]),nula) then begin
+                			help:=matice[i,k]/matice[i,i];
+                        	       	for j:=i+1 to n-1 do matice[j,k]:=matice[j,k]-help*matice[j,i];
+	                                vektor[k]:=vektor[k]-help*vektor[i];
+        	                end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
+                	end;
+		end
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
