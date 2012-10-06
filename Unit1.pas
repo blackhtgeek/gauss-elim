@@ -37,6 +37,7 @@ procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
 procedure gauss(n:integer; var matice:Matrix; var vektor:Vector);
 procedure outprint(var n:integer; var vektor:Vector);
 procedure popis_stringgrid(n:integer);
+procedure gauss_jordan(n:integer; var matice:Matrix; var vektor:Vector);
 
 implementation
 
@@ -54,6 +55,12 @@ begin
               return:=k;
         end;
   pivot_lookup:=return;
+end;
+
+procedure gauss_jordan(n:integer; var matice:integer; var vektor:Vector);
+begin
+	gauss(n,matice,vektor);{mame matici s nulami pod hlavni diagonalou}
+	{ted jeste ziskat nuly nad hlavni diagonalou}
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -104,7 +111,7 @@ begin
 {Gaussova elimiace s vyberem pivota}
         try for i:=0 to n-1 do begin
                 pivot:=pivot_lookup(i,n,matice); {najdu nejvetsi prvek ve sloupci}
-		if isZero(pivot,nula) then ShowMessage('Neni pravda, ze existuje jedine reseni')
+		if isZero(pivot,nula) then begin ShowMessage('Neni pravda, ze existuje jedine reseni'); noresult:=true; end
 		else begin
 	                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
         	        for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
@@ -117,7 +124,7 @@ begin
 		end;
         end;
         except on E:Exception do ShowMessage(E.Message); end;
-        if not isZero(pivot,nula) then rev_sbst(matice,vektor,n); {reverzni substituci ziskam reseni}
+        {if not isZero(pivot,nula) then rev_sbst(matice,vektor,n);} {reverzni substituci ziskam reseni}
 end;
 
 procedure outprint(var n:integer; var vektor:Vector);
@@ -140,8 +147,10 @@ begin
                         Val(StringGrid1.Cells[i,j],matice[i-1,j-1],code);
         for i:=0 to n do
                 Val(StringGrid1.Cells[n+1,i+1],vektor[i],code);
-        {spusti Gaussovu eliminaci, ziskame vektor reseni}
+        {spusti Gaussovu eliminaci}
         gauss(n,matice,vektor);
+	{spusti reverzni substituci, ziskame vektor reseni}
+	if not noresult then rev_sbst(matice,vektor,n);
         {vypis vektoru na obrazovku}
         outprint(n,vektor);
 end;
