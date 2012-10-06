@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 229
-  Top = 325
+  Left = 136
+  Top = 109
   Width = 841
   Height = 442
   Caption = 'Gaussova eliminace'
@@ -29,9 +29,8 @@ object Form1: TForm1
   object Label2: TLabel
     Left = 344
     Top = 16
-    Width = 55
+    Width = 3
     Height = 16
-    Caption = 'vysledek'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13

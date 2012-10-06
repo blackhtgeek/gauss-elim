@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, Grids, Spin, Math;
+  Dialogs, StdCtrls, ComCtrls, Grids, Spin;
 
 type Vector = array[0..9] of real;
 type Matrix = array[0..9,0..9] of real;
@@ -30,7 +30,6 @@ const nula=0.000001;
 var
   Form1: TForm1;
   n:integer;
-  noresult:boolean;
 
 procedure swap(i,n,pivot:integer;var matice:Matrix;var vektor:Vector);
 procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
@@ -43,19 +42,24 @@ implementation
 {$R *.dfm}
 
 function pivot_lookup(i:integer; n:integer; var matice:Matrix):integer;
-var k,return:integer; max:real;
+var k,return:integer; max:real; vyjimka:Exception;
 begin
   {v i-tem sloupci hledam nejvetsi prvek}
+  vyjimka:=Exception.Create('Reseni je nejednoznacne - hledane maximum v '+inttostr(i+1)+' sloupci je 0');
   return:=i;
-  max:=abs(matice[i][i]);
-  {if IsZero(max,nula) then begin ShowMessage('Reseni je nejednoznacne - hledane maximum v '+inttostr(i+1)+' sloupci je 0'); end;}
-  for k:=i+1 to n-1 do
-        if abs(matice[k,i])>max then begin
-              max:=abs(matice[k,i]);
-                {if isZero(max,nula) then ShowMessage('Reseni je nejednoznacne - hledane maximum v '+inttostr(i+1)+' sloupci je 0');}
-                return:=k;
-        end;
-  pivot_lookup:=return;
+  try
+        max:=abs(matice[i][i]);
+        if max<=nula then raise vyjimka;
+        for k:=i+1 to n-1 do
+                if abs(matice[k,i])>max then begin
+                    max:=abs(matice[k,i]);
+                    if max<=nula then raise vyjimka;
+                    return:=k;
+                 end;
+  except
+        on E:Exception do ShowMessage(E.Message);
+  end;
+        pivot_lookup:=return;
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -67,7 +71,6 @@ begin
         StringGrid1.Refresh;
         popis_stringgrid(n);
         StringGrid1.Enabled:=true;
-        noresult:=false;
 end;
 
 procedure swap(i,n,pivot:integer;var matice:Matrix;var vektor:Vector);
@@ -88,15 +91,16 @@ procedure rev_sbst(var matice:Matrix;var vektor:Vector;var n:integer);
 var i,j:integer;
 begin
     {zpetne dosazuji a ziskavam reseni soustavy v poli vektor}
-     if isZero(matice[n-1,n-1],nula) then begin
-        if not isZero(vektor[n-1],nula) then ShowMessage('Soustava nema reseni')
-        else if isZero(vektor[n+1],nula) then ShowMessage('Resenim je mnozina realnych cisel');
-        noresult:=true;
-     end
+     try
+     if matice[n-1,n-1]=0 then
+        if vektor[n-1]<>0 then raise Exception.Create('Soustava nema reseni')
+        else if vektor[n+1]=0 then Exception.Create('Resenim je mnozina realnych cisel')
      else for i:=n-1 downto 0 do begin
         for j:=i+1 to n-1 do vektor[i]:=vektor[i]-matice[j,i]*vektor[j];
-        if not isZero(abs(matice[i,i]),nula) then vektor[i]:=vektor[i]/matice[i,i]
-        else ShowMessage('Spatny vstup - nedovolene deleni nulou');
+        if abs(matice[i,i])>nula then vektor[i]:=vektor[i]/matice[i,i]
+        else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
+     end;
+     except on E:Exception do ShowMessage(E.Message);
      end;
 end;
 
@@ -108,7 +112,7 @@ begin
                 pivot:=pivot_lookup(i,n,matice); {najdu nejvetsi prvek ve sloupci}
                 if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
                 for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
-                        if not isZero(abs(matice[i,i]),nula) then begin
+                        if abs(matice[i,i])>nula then begin
                                 help:=matice[i,k]/matice[i,i];
                                 for j:=i+1 to n-1 do matice[j,k]:=matice[j,k]-help*matice[j,i];
                                 vektor[k]:=vektor[k]-help*vektor[i];
@@ -123,11 +127,11 @@ procedure outprint(var n:integer; var vektor:Vector);
 var i:integer;
 begin
   {vypisu mnozinu reseni do labelu}
-  if not noresult then begin
-        Form1.Label2.Caption:='K={';
-        for i:=0 to n-1 do Form1.Label2.Caption:=Form1.Label2.Caption+floattostr(vektor[i])+',';
-        Form1.Label2.Caption:=Form1.Label2.Caption+'}';
-  end else Form1.Label2.Caption:='';
+        if form1.label2.Caption=' ' then begin
+                Form1.Label2.Caption:='K={';
+                for i:=0 to n-1 do Form1.Label2.Caption:=Form1.Label2.Caption+floattostr(vektor[i])+',';
+                Form1.Label2.Caption:='}';
+        end;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
