@@ -72,6 +72,7 @@ begin
         	                end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
                 	end;
 		end
+	outprint(n,vektor);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -168,7 +169,6 @@ end;
 
 procedure popis_stringgrid(n:integer);
 const a=ord('a');
-const x=ord('x');
 var i:integer;
 begin
   {popise policka ve stringgridu pro uzivatelskou privetivost}
