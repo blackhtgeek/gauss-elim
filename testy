@@ -1,0 +1,16 @@
+a) existuje jedine reseni [3x3]
+1  2  5 | -9
+1 -1  3 |  2
+3 -6 -1 | 25
+b) nema reseni [3x3]
+1  2  5 |   9
+2  4 10 | -18
+3  6 15 |  27
+c) nema reseni [3x3]
+1  2  5 | -9
+2  4 10 | 18
+3  6 15 | 27
+d) nekonecne mnoho reseni [3x3]
+1  2  5 |  9
+2  4 10 | 18
+3  6 15 | 27
