@@ -60,18 +60,22 @@ end;
 procedure gauss_jordan(n:integer; var matice:integer; var vektor:Vector);
 var i,j,k:integer;
 begin
-	gauss(n,matice,vektor);{mame matici s nulami pod hlavni diagonalou}
-	{ted jeste ziskat nuly nad hlavni diagonalou}
-	try for i:=0 to n-1 do
-		if not noresult then begin
-			for k:=i+1 downto 0 do begin {pro vsechny vyssi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
-           			if not isZero(abs(matice[i,i]),nula) then begin
-                			help:=matice[i,k]/matice[i,i];
-                        	       	for j:=i+1 to n-1 do matice[j,k]:=matice[j,k]-help*matice[j,i];
-	                                vektor[k]:=vektor[k]-help*vektor[i];
-        	                end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
-                	end;
+	{jednicky na hlavni diagonale a jinde nuly, vektor reseni bez zpetneho chodu}
+	try for i:=0 to n-1 do begin{jdu po radcich}
+		pivot:=pivot_lookup(i,n,matice); {najdu nejvetsi prvek ve sloupci}
+		if isZero(pivot,nula) then begin ShowMessage('Neni pravda, ze existuje jedine reseni'); noresult:=true; end
+		else begin
+	                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
+			{delim radek i pivotem}
+			vektor[i]:=vektor[i]/matice[i,i];
+			for j:=n-1 downto i do matice[j,i]:=matice[j,i]/matice[i,i];{v radku vydelime prvky prvkem na hlavni diagonale - na hlavni diagonale je 1}
+			for k:=0 to n-1 do{vsechny radky od 0 do n-1}
+				if k<>i then begin{pokud se radek nerovna normovanemu}
+					vektor[k]:=vektor[k]-matice[i,k]*vektor[i];
+					for j:=n-1 downto i do matice[j,k]:=matice[j,k]-matice[i,k]*matice[j,i]
+				end
 		end
+	end;
 	outprint(n,vektor);
 end;
 
