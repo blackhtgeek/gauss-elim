@@ -129,8 +129,8 @@ begin
 {Gaussova elimiace s vyberem pivota}
         try for i:=0 to n-1 do begin
                 pivot:=pivot_lookup(i,n,matice); {najdu nejvetsi prvek ve sloupci}
-		if isZero(pivot,nula) then begin ShowMessage('Neni pravda, ze existuje jedine reseni'); noresult:=true; end
-		else begin
+		{if isZero(pivot,nula) then begin ShowMessage('Neni pravda, ze existuje jedine reseni'); noresult:=true; end
+		else begin}
 	                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
         	        for k:=i+1 to n-1 do begin {pro vsechny nizsi radky v matici budu delit a odecitat (pokud je cislo nenulove)}
                 	        if not isZero(abs(matice[i,i]),nula) then begin
@@ -139,7 +139,7 @@ begin
 	                                vektor[k]:=vektor[k]-help*vektor[i];
         	                end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
                 	end;
-		end;
+		{end;}
         end;
         except on E:Exception do ShowMessage(E.Message); end;
         {if not isZero(pivot,nula) then rev_sbst(matice,vektor,n);} {reverzni substituci ziskam reseni}
