@@ -66,14 +66,16 @@ begin
 		if isZero(pivot,nula) then begin ShowMessage('Neni pravda, ze existuje jedine reseni'); noresult:=true; end
 		else begin
 	                if i <> pivot then swap(i,n,pivot,matice,vektor); {pivot neni na [i,i] prohodim radky}
-			{delim radek i pivotem}
-			vektor[i]:=vektor[i]/matice[i,i];
-			for j:=n-1 downto i do matice[j,i]:=matice[j,i]/matice[i,i];{v radku vydelime prvky prvkem na hlavni diagonale - na hlavni diagonale je 1}
-			for k:=0 to n-1 do{vsechny radky od 0 do n-1}
-				if k<>i then begin{pokud se radek nerovna normovanemu}
-					vektor[k]:=vektor[k]-matice[i,k]*vektor[i];
-					for j:=n-1 downto i do matice[j,k]:=matice[j,k]-matice[i,k]*matice[j,i]
-				end
+			if not isZero(abs(matice[i,i]),nula) then begin
+				{delim radek i pivotem}
+				vektor[i]:=vektor[i]/matice[i,i];
+				for j:=n-1 downto i do matice[j,i]:=matice[j,i]/matice[i,i];{v radku vydelime prvky prvkem na hlavni diagonale - na hlavni diagonale je 1}
+				for k:=0 to n-1 do{vsechny radky od 0 do n-1}
+					if k<>i then begin{pokud se radek nerovna normovanemu}
+						vektor[k]:=vektor[k]-matice[i,k]*vektor[i];
+						for j:=n-1 downto i do matice[j,k]:=matice[j,k]-matice[i,k]*matice[j,i]
+					end
+			end else raise Exception.Create('Spatny vstup - nedovolene deleni nulou');
 		end
 	end;
 	outprint(n,vektor);
